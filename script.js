@@ -1,26 +1,13 @@
-const songs = [
-  {name:"Ganpati Bappa Morya", file:"songs/song1.mp3"},
-  {name:"Deva Shree Ganesha", file:"songs/song2.mp3"},
-  {name:"Morya Morya", file:"songs/song3.mp3"},
-  {name:"Ganpati DJ Remix", file:"songs/song4.mp3"},
-  {name:"Ganpati Bappa Morya (Dhol Mix)", file:"songs/song5.mp3"},
-  {name:"Jai Dev Jai Dev", file:"songs/song6.mp3"}
+const songs=[
+{title:"Gajanand Vandan Karte Hain",artist:"Mukesh Bagda",id:"Sgtv44mxKdo"},
+{title:"अपना दूसरा Ganpati Song",artist:"YouTube ID जोड़ें",id:""},
+{title:"अपना तीसरा Ganpati Song",artist:"YouTube ID जोड़ें",id:""},
+{title:"अपना चौथा Ganpati Song",artist:"YouTube ID जोड़ें",id:""}
 ];
-
-const audio=document.getElementById("audio"), play=document.getElementById("play");
-const title=document.getElementById("songTitle"), list=document.getElementById("list");
-const bar=document.getElementById("bar"), current=document.getElementById("current"), duration=document.getElementById("duration");
-let index=0;
-
-function fmt(s){if(!isFinite(s))return"0:00";let m=Math.floor(s/60),sec=Math.floor(s%60).toString().padStart(2,"0");return`${m}:${sec}`}
-function load(i){index=(i+songs.length)%songs.length;audio.src=songs[index].file;title.textContent=songs[index].name;render()}
-function render(){list.innerHTML=songs.map((s,i)=>`<div class="track ${i===index?"active":""}" data-i="${i}"><span class="num">${i+1}</span><span class="name">${s.name}</span><small>▶</small></div>`).join("");list.querySelectorAll(".track").forEach(x=>x.onclick=()=>{load(+x.dataset.i);audio.play().catch(()=>{});play.textContent="⏸"})}
-function toggle(){if(audio.paused){audio.play().catch(()=>{});play.textContent="⏸"}else{audio.pause();play.textContent="▶"}}
-play.onclick=toggle; document.getElementById("start").onclick=()=>{if(!audio.src)load(0);audio.play().catch(()=>{});play.textContent="⏸"};
-document.getElementById("prev").onclick=()=>{load(index-1);audio.play().catch(()=>{});play.textContent="⏸"};
-document.getElementById("next").onclick=()=>{load(index+1);audio.play().catch(()=>{});play.textContent="⏸"};
-document.getElementById("volume").oninput=e=>audio.volume=e.target.value;
-audio.addEventListener("loadedmetadata",()=>duration.textContent=fmt(audio.duration));
-audio.addEventListener("timeupdate",()=>{current.textContent=fmt(audio.currentTime);bar.style.width=(audio.currentTime/audio.duration*100||0)+"%"});
-audio.addEventListener("ended",()=>{load(index+1);audio.play().catch(()=>{})});
-load(0); audio.volume=.9;
+let current=0;const list=document.querySelector("#list"),count=document.querySelector("#count");
+function render(){count.textContent=songs.length+" Songs";list.innerHTML=songs.map((s,i)=>`<div class="song ${i==current?"active":""}" data-i="${i}"><img src="ganpati-hero.png"><div><b>${s.title}</b><small>${s.artist}</small></div><span>${s.id?"▶":"•"}</span></div>`).join("");document.querySelectorAll(".song").forEach(x=>x.onclick=()=>select(+x.dataset.i))}
+function select(i){current=i;let s=songs[i];document.querySelector("#title").textContent=s.title;document.querySelector("#artist").textContent=s.artist;if(s.id)document.querySelector("#yt").src="https://www.youtube.com/embed/"+s.id+"?rel=0&autoplay=1";render()}
+document.querySelector("#prev").onclick=()=>select((current-1+songs.length)%songs.length);
+document.querySelector("#next").onclick=()=>select((current+1)%songs.length);
+function bell(){let C=window.AudioContext||window.webkitAudioContext;if(!C)return;let c=new C(),n=c.currentTime;[0,.1,.2].forEach((d,i)=>{let o=c.createOscillator(),g=c.createGain();o.frequency.value=[620,510,430][i];g.gain.setValueAtTime(0,n+d);g.gain.linearRampToValueAtTime(.22,n+d+.03);g.gain.exponentialRampToValueAtTime(.001,n+d+1.4);o.connect(g);g.connect(c.destination);o.start(n+d);o.stop(n+d+1.5)});document.querySelectorAll(".bell").forEach(b=>b.animate([{transform:"rotate(-8deg)"},{transform:"rotate(8deg)"},{transform:"rotate(0)"}],{duration:500}));setTimeout(()=>c.close(),1800)}
+document.querySelector("#bell").onclick=bell;document.querySelector("#bell2").onclick=bell;render();

@@ -1,67 +1,23 @@
-<!DOCTYPE html>
-<html lang="hi">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>गणपति की फौज करेंगी मौज</title>
-  <link rel="stylesheet" href="style.css">
-</head>
+<!doctype html>
+<html lang="hi"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#8f120b"><title>गणपति की फौज करेंगी मौज</title>
+<link rel="stylesheet" href="style.css"></head>
 <body>
-  <div class="glow"></div>
-  <main class="app">
-    <header>
-      <div class="om">ॐ</div>
-      <p class="morya">गणपति बप्पा मोरया</p>
-      <h1>गणपति की फौज<br><span>करेंगी मौज</span></h1>
-      <p class="tagline">🔊 BAPPA MUSIC ZONE 🔊</p>
-    </header>
-
-    <section class="hero">
-      <img src="ganpati-hero.png" alt="Ganpati Bappa">
-    </section>
-
-    <section class="player">
-      <div class="song-info">
-        <div class="disc">🐘</div>
-        <div>
-          <div class="eyebrow">अब बज रहा है</div>
-          <h2 id="songTitle">पहला गाना चुनें</h2>
-        </div>
-      </div>
-
-      <div class="progress"><div id="bar"></div></div>
-      <div class="times"><span id="current">0:00</span><span id="duration">0:00</span></div>
-
-      <div class="controls">
-        <button id="prev">⏮</button>
-        <button id="play" class="play">▶</button>
-        <button id="next">⏭</button>
-      </div>
-
-      <button id="start" class="start">🔊 BAPPA KE GAANE BAJAO</button>
-
-      <label class="volume">🔊 <input id="volume" type="range" min="0" max="1" step="0.01" value="0.9"></label>
-      <audio id="audio" preload="metadata"></audio>
-      <iframe
-  width="100%"
-  height="400"
-  src="https://www.youtube.com/embed/Sgtv44mxKdo"
-  title="Gajanand Vandan Karte Hain | Ganesh Bhajan"
-  frameborder="0"
-  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-  referrerpolicy="strict-origin-when-cross-origin"
-  allowfullscreen>
-</iframe>
-    </section>
-
-    <section class="playlist">
-      <h2>🎵 BAPPA PLAYLIST 🎵</h2>
-      <p class="hint">नीचे अपने MP3 files डालकर नाम बदल सकते हो।</p>
-      <div id="list"></div>
-    </section>
-
-    <footer>🚩 गणपति बप्पा मोरया 🚩</footer>
-  </main>
-  <script src="script.js"></script>
-</body>
-</html>
+<header><div class="brand"><span>ॐ</span><div>गणपति की फौज<br><b>करेंगी मौज</b></div></div>
+<nav><a href="#home">Home</a><a href="#songs">Songs</a><a href="#about">About</a></nav>
+<button id="bell" class="bell">🔔 <i>मंदिर की घंटी</i></button></header>
+<main id="home">
+<section class="hero"><div><p>🚩 गणपति बप्पा मोरया 🚩</p><h1>भक्ति • मस्ती • DJ</h1><h2>|| जय गणेश देवा ||</h2></div>
+<img src="ganpati-hero.png" alt="Ganpati festival"></section>
+<section class="layout" id="songs">
+<aside class="playlist"><div class="head"><h2>🎵 Playlist</h2><span id="count"></span></div><div id="list"></div></aside>
+<section class="player"><small>NOW PLAYING</small><img id="cover" src="ganpati-hero.png" alt="">
+<h2 id="title">Gajanand Vandan Karte Hain</h2><p id="artist">Mukesh Bagda</p>
+<div class="yt"><iframe id="yt" src="https://www.youtube.com/embed/videoseries?list=PLBdB2QrKw3SQ&rel=0" title="Ganpati YouTube Playlist" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+<div class="controls"><button id="prev">⏮</button><button id="bell2">🔔</button><button id="next">⏭</button></div>
+<small>▶️ गाना YouTube player के अंदर से चलाएँ</small></section></section>
+<section class="notice">🚩 <div><b>गणपति बप्पा मोरया!</b><br><span>YouTube embedded player के जरिए गाने चलाए जाते हैं।</span></div></section>
+<section class="about" id="about"><h2>गणपति की फौज करेंगी मौज</h2><p>बप्पा के आशीर्वाद के साथ ❤️</p></section>
+</main><footer>© 2026 गणपति की फौज करेंगी मौज</footer>
+<script src="script.js"></script></body></html>
