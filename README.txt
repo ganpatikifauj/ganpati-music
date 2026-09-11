@@ -1,3 +1,14 @@
-Ganpati Ki Fauj Karegi Mauj - responsive YouTube music website.
-Upload all files to the GitHub repository root and enable GitHub Pages from main / (root).
-To add songs, edit the songs[] list in script.js and put the YouTube video ID in id:"".
+GANPATI KI FAUJ KARENGI MAUJ — FINAL
+
+Files to upload to GitHub:
+- index.html
+- style.css
+- script.js
+- ganpati-hero.png
+- temple-bell.mp3
+
+Main YouTube playlist:
+PLBdB2QrKw3SQ
+
+The 🔔 buttons use the uploaded temple-bell.mp3.
+The website is responsive for phone and PC.

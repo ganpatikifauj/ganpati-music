@@ -1,23 +1,65 @@
 <!doctype html>
-<html lang="hi"><head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#8f120b"><title>गणपति की फौज करेंगी मौज</title>
-<link rel="stylesheet" href="style.css"></head>
+<html lang="hi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#090b12">
+<title>गणपति की फौज करेंगी मौज</title>
+<link rel="stylesheet" href="style.css">
+</head>
 <body>
-<header><div class="brand"><span>ॐ</span><div>गणपति की फौज<br><b>करेंगी मौज</b></div></div>
-<nav><a href="#home">Home</a><a href="#songs">Songs</a><a href="#about">About</a></nav>
-<button id="bell" class="bell">🔔 <i>मंदिर की घंटी</i></button></header>
-<main id="home">
-<section class="hero"><div><p>🚩 गणपति बप्पा मोरया 🚩</p><h1>भक्ति • मस्ती • DJ</h1><h2>|| जय गणेश देवा ||</h2></div>
-<img src="ganpati-hero.png" alt="Ganpati festival"></section>
-<section class="layout" id="songs">
-<aside class="playlist"><div class="head"><h2>🎵 Playlist</h2><span id="count"></span></div><div id="list"></div></aside>
-<section class="player"><small>NOW PLAYING</small><img id="cover" src="ganpati-hero.png" alt="">
-<h2 id="title">Gajanand Vandan Karte Hain</h2><p id="artist">Mukesh Bagda</p>
-<div class="yt"><iframe id="yt" src="https://www.youtube.com/embed/videoseries?list=PLBdB2QrKw3SQ&rel=0" title="Ganpati YouTube Playlist" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
-<div class="controls"><button id="prev">⏮</button><button id="bell2">🔔</button><button id="next">⏭</button></div>
-<small>▶️ गाना YouTube player के अंदर से चलाएँ</small></section></section>
-<section class="notice">🚩 <div><b>गणपति बप्पा मोरया!</b><br><span>YouTube embedded player के जरिए गाने चलाए जाते हैं।</span></div></section>
-<section class="about" id="about"><h2>गणपति की फौज करेंगी मौज</h2><p>बप्पा के आशीर्वाद के साथ ❤️</p></section>
-</main><footer>© 2026 गणपति की फौज करेंगी मौज</footer>
-<script src="script.js"></script></body></html>
+<div class="bg"></div>
+
+<header class="topbar">
+  <div class="brand"><span class="om">ॐ</span><span>गणपति की फौज <b>करेंगी मौज</b></span></div>
+  <div class="live"><span></span> गणपति उत्सव</div>
+  <button id="bell" class="iconbtn" aria-label="मंदिर की घंटी">🔔</button>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="hero-copy">
+      <div class="eyebrow">🚩 GANPATI UTSAV • 2026</div>
+      <h1>गणपति<br><em>की फौज</em></h1>
+      <p>करेंगी मौज</p>
+      <small>भक्ति के साथ मस्ती भी ❤️</small>
+    </div>
+    <img class="ganpati" src="ganpati-hero.png" alt="Ganpati">
+  </section>
+
+  <section class="player-wrap">
+    <div class="player">
+      <div class="art"><img src="ganpati-hero.png" alt=""></div>
+      <div class="meta">
+        <div class="now">NOW PLAYING</div>
+        <h2 id="title">Ganpati Playlist</h2>
+        <p id="artist">YouTube Music</p>
+        <div class="bar"><span></span></div>
+        <div class="times"><span>0:00</span><span>Playlist</span></div>
+      </div>
+      <div class="controls">
+        <button id="prev">⏮</button>
+        <button id="play">▶</button>
+        <button id="next">⏭</button>
+        <button id="listBtn">☷</button>
+      </div>
+    </div>
+
+    <div class="ytbox" id="ytbox">
+      <iframe id="yt" src="https://www.youtube.com/embed/videoseries?list=PLBdB2QrKw3SQ&rel=0&origin=https%3A%2F%2Fomsaini072006-debug.github.io" title="Ganpati YouTube playlist" referrerpolicy="origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+    </div>
+
+    <div class="playlist" id="playlist">
+      <div class="plist-head"><b>Playlist</b><button id="closeList">×</button></div>
+      <p>तुम्हारी YouTube Music playlist</p>
+      <a href="https://music.youtube.com/playlist?list=PLBdB2QrKw3SQ" target="_blank" rel="noopener">Open playlist in YouTube Music ↗</a>
+    </div>
+  </section>
+
+  <div class="bottom-note"><span>🔔</span><b>मंदिर की घंटी</b><small>Button दबाकर bell बजाएँ</small></div>
+</main>
+
+<footer>गणपति बप्पा मोरया 🙏</footer>
+<script src="script.js"></script>
+</body>
+</html>
