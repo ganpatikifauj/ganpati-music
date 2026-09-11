@@ -18,12 +18,13 @@ let timer = null;
 // Real YouTube playback, but the video surface stays hidden so the site behaves like an audio player.
 window.onYouTubeIframeAPIReady = function () {
   player = new YT.Player('yt', {
-    width: '1',
-    height: '1',
+    width: '240',
+    height: '135',
     playerVars: {
       listType: 'playlist',
       list: 'PLBdB2QrKw3SQ',
       autoplay: 0,
+      enablejsapi: 1,
       controls: 0,
       rel: 0,
       playsinline: 1,
@@ -32,6 +33,7 @@ window.onYouTubeIframeAPIReady = function () {
     events: {
       onReady: () => {
         ready = true;
+        artist.textContent = 'Ready — Play दबाएँ';
         updateInfo();
       },
       onStateChange: (e) => {
