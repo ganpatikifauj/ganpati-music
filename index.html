@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>गणपति की फौज करेंगी मौज</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="glow"></div>
+  <main class="app">
+    <header>
+      <div class="om">ॐ</div>
+      <p class="morya">गणपति बप्पा मोरया</p>
+      <h1>गणपति की फौज<br><span>करेंगी मौज</span></h1>
+      <p class="tagline">🔊 BAPPA MUSIC ZONE 🔊</p>
+    </header>
+
+    <section class="hero">
+      <img src="ganpati-hero.png" alt="Ganpati Bappa">
+    </section>
+
+    <section class="player">
+      <div class="song-info">
+        <div class="disc">🐘</div>
+        <div>
+          <div class="eyebrow">अब बज रहा है</div>
+          <h2 id="songTitle">पहला गाना चुनें</h2>
+        </div>
+      </div>
+
+      <div class="progress"><div id="bar"></div></div>
+      <div class="times"><span id="current">0:00</span><span id="duration">0:00</span></div>
+
+      <div class="controls">
+        <button id="prev">⏮</button>
+        <button id="play" class="play">▶</button>
+        <button id="next">⏭</button>
+      </div>
+
+      <button id="start" class="start">🔊 BAPPA KE GAANE BAJAO</button>
+
+      <label class="volume">🔊 <input id="volume" type="range" min="0" max="1" step="0.01" value="0.9"></label>
+      <audio id="audio" preload="metadata"></audio>
+    </section>
+
+    <section class="playlist">
+      <h2>🎵 BAPPA PLAYLIST 🎵</h2>
+      <p class="hint">नीचे अपने MP3 files डालकर नाम बदल सकते हो।</p>
+      <div id="list"></div>
+    </section>
+
+    <footer>🚩 गणपति बप्पा मोरया 🚩</footer>
+  </main>
+  <script src="script.js"></script>
+</body>
+</html>
