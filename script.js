@@ -37,6 +37,7 @@ window.onYouTubeIframeAPIReady = function () {
       onReady: () => {
         ready = true;
         artist.textContent = 'Ready — Play दबाएँ';
+        try { player.setPlaybackQuality('small'); } catch (_) {}
         updateInfo();
         loadPlaylistItems();
         pollForPlaylist();
@@ -96,7 +97,18 @@ async function loadPlaylistItems() {
       <img src="https://img.youtube.com/vi/${id}/mqdefault.jpg" alt="">
       <div class="pltxt"><b>Loading…</b><span>&nbsp;</span></div>`;
     row.onclick = () => {
+      // Instant UI feedback so it doesn't feel stuck while YouTube buffers the new track.
+      const b = row.querySelector('.pltxt b');
+      const span = row.querySelector('.pltxt span');
+      title.textContent = b ? b.textContent : `Track ${i + 1}`;
+      artist.textContent = 'Loading…';
+      progress.style.width = '0%';
+      currentTime.textContent = '0:00';
+      document.querySelectorAll('.pl-item').forEach(el => el.classList.remove('active'));
+      row.classList.add('active');
+
       player.playVideoAt(i);
+      try { player.setPlaybackQuality('small'); } catch (_) {}
       playing = true;
       playBtn.textContent = '❚❚';
     };
@@ -169,8 +181,8 @@ playBtn.onclick = () => {
   else player.playVideo();
 };
 
-prevBtn.onclick = () => { if (ready) player.previousVideo(); };
-nextBtn.onclick = () => { if (ready) player.nextVideo(); };
+prevBtn.onclick = () => { if (ready) { player.previousVideo(); artist.textContent = 'Loading…'; } };
+nextBtn.onclick = () => { if (ready) { player.nextVideo(); artist.textContent = 'Loading…'; } };
 
 bell.onclick = () => {
   const a = new Audio('temple-bell.mp3');
