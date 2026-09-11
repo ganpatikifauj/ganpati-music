@@ -107,13 +107,13 @@ async function loadPlaylistItems() {
       .then(r => r.ok ? r.json() : null)
       .then(info => {
         if (!info) return;
-        const b = row.querySelector('b');
-        const span = row.querySelector('span');
+        const b = row.querySelector('.pltxt b');
+        const span = row.querySelector('.pltxt span');
         if (b) b.textContent = info.title || `Track ${i + 1}`;
         if (span) span.textContent = info.author_name || '';
       })
       .catch(() => {
-        const b = row.querySelector('b');
+        const b = row.querySelector('.pltxt b');
         if (b) b.textContent = `Track ${i + 1}`;
       });
   });

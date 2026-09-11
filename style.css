@@ -29,7 +29,7 @@
 .pl-item{display:flex;align-items:center;gap:10px;padding:8px 6px;border-radius:12px;cursor:pointer}
 .pl-item:hover{background:#ffffff0d}
 .pl-item.active{background:#ffb83d22;border:1px solid #ffb83d55}
-.pl-item .plnum{width:18px;font-size:11px;color:#888;text-align:center;flex-shrink:0}
+.pl-item .plnum{width:18px;font-size:11px;color:#888;text-align:center;flex-shrink:0;white-space:nowrap;overflow:hidden}
 .pl-item.active .plnum{color:#ffb83d}
 .pl-item img{width:40px;height:40px;border-radius:9px;object-fit:cover;flex-shrink:0}
 .pl-item .pltxt{min-width:0;flex:1}
