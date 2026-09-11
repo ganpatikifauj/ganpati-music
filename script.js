@@ -39,6 +39,7 @@ window.onYouTubeIframeAPIReady = function () {
         artist.textContent = 'Ready — Play दबाएँ';
         updateInfo();
         loadPlaylistItems();
+        pollForPlaylist();
       },
       onStateChange: (e) => {
         playing = e.data === YT.PlayerState.PLAYING;
@@ -46,6 +47,7 @@ window.onYouTubeIframeAPIReady = function () {
         if (playing) startProgress(); else stopProgress();
         updateInfo();
         highlightActive();
+        if (!playlistIds.length) loadPlaylistItems();
       },
       onError: () => {
         artist.textContent = 'YouTube song unavailable';
@@ -128,6 +130,15 @@ function highlightActive() {
   });
 }
 
+// YouTube sometimes needs a moment before getPlaylist() returns real data — retry quickly a few times.
+function pollForPlaylist(tries = 0) {
+  if (playlistIds.length || tries > 15) return;
+  setTimeout(() => {
+    loadPlaylistItems();
+    pollForPlaylist(tries + 1);
+  }, 300);
+}
+
 function fmt(sec) {
   sec = Math.max(0, Math.floor(sec || 0));
   return `${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, '0')}`;
@@ -170,7 +181,12 @@ bell.onclick = () => {
   );
 };
 
-listBtn.onclick = () => playlist.classList.toggle('open');
+listBtn.onclick = () => {
+  playlist.classList.toggle('open');
+  if (playlist.classList.contains('open') && !playlistIds.length && ready) {
+    loadPlaylistItems();
+  }
+};
 closeList.onclick = () => playlist.classList.remove('open');
 
 loadYouTubeAPI();
