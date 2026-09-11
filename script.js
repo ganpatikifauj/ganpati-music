@@ -10,109 +10,106 @@ const artist = document.querySelector('#artist');
 const progress = document.querySelector('.bar span');
 const currentTime = document.querySelector('.times span:first-child');
 
-const PLAYLIST_ID = 'PLBdB2QrKw3SQ';
 let player = null;
 let ready = false;
+let playing = false;
 let timer = null;
 
-function setStatus(text){ artist.textContent = text; }
-
-// YouTube requires a real player surface (at least 200x200). The CSS keeps
-// this surface visually out of the design while the official player still
-// supplies the audio and playback state.
+// Real YouTube playback via the official IFrame Player API.
+// The player stays visible (small thumbnail) per YouTube's Terms of Service — it is not hidden or disguised.
 window.onYouTubeIframeAPIReady = function () {
   player = new YT.Player('yt', {
-    width: '200',
-    height: '200',
+    width: '100%',
+    height: '100%',
     playerVars: {
       listType: 'playlist',
-      list: PLAYLIST_ID,
+      list: 'PLBdB2QrKw3SQ',
+      autoplay: 0,
+      enablejsapi: 1,
       controls: 0,
       rel: 0,
       playsinline: 1,
-      modestbranding: 1,
       origin: window.location.origin
     },
     events: {
-      onReady: function () {
+      onReady: () => {
         ready = true;
-        try { player.setLoop(false); } catch(e) {}
-        setStatus('Ready — Play दबाएँ');
+        artist.textContent = 'Ready — Play दबाएँ';
         updateInfo();
       },
-      onStateChange: function (e) {
-        const isPlaying = e.data === YT.PlayerState.PLAYING;
-        playBtn.textContent = isPlaying ? '❚❚' : '▶';
-        if (isPlaying) startProgress(); else stopProgress();
+      onStateChange: (e) => {
+        playing = e.data === YT.PlayerState.PLAYING;
+        playBtn.textContent = playing ? '❚❚' : '▶';
+        if (playing) startProgress(); else stopProgress();
         updateInfo();
       },
-      onError: function (e) {
-        playBtn.textContent = '▶';
-        const messages = {2:'YouTube video ID error',5:'YouTube HTML5 player error',100:'Song unavailable',101:'Song cannot be embedded',150:'Song cannot be embedded'};
-        setStatus(messages[e.data] || 'YouTube playback unavailable');
+      onError: () => {
+        artist.textContent = 'YouTube song unavailable';
       }
     }
   });
 };
 
-function loadYouTubeAPI(){
-  if (window.YT && window.YT.Player) {
-    window.onYouTubeIframeAPIReady();
-    return;
-  }
+function loadYouTubeAPI() {
   if (document.querySelector('script[data-youtube-api]')) return;
   const s = document.createElement('script');
   s.src = 'https://www.youtube.com/iframe_api';
-  s.async = true;
   s.dataset.youtubeApi = '1';
   document.head.appendChild(s);
 }
 
-function updateInfo(){
-  if(!player || !ready) return;
-  try{
+function updateInfo() {
+  if (!player || !ready) return;
+  try {
     const data = player.getVideoData();
-    if(data?.title) title.textContent = data.title;
-    if(data?.author) artist.textContent = data.author;
-  }catch(e){}
+    if (data && data.title) title.textContent = data.title;
+    if (data && data.author) artist.textContent = data.author;
+  } catch (_) {}
 }
 
-function fmt(sec){
+function fmt(sec) {
   sec = Math.max(0, Math.floor(sec || 0));
-  return `${Math.floor(sec/60)}:${String(sec%60).padStart(2,'0')}`;
+  return `${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, '0')}`;
 }
 
-function startProgress(){
+function startProgress() {
   stopProgress();
-  timer = setInterval(()=>{
-    if(!player || !ready) return;
+  timer = setInterval(() => {
+    if (!player || !ready) return;
     const d = player.getDuration() || 0;
     const t = player.getCurrentTime() || 0;
     currentTime.textContent = fmt(t);
-    progress.style.width = d ? `${Math.min(100,(t/d)*100)}%` : '0%';
-  },500);
+    progress.style.width = d ? `${Math.min(100, t / d * 100)}%` : '0%';
+  }, 500);
 }
-function stopProgress(){ if(timer){clearInterval(timer);timer=null;} }
+function stopProgress() {
+  if (timer) clearInterval(timer);
+  timer = null;
+}
 
-playBtn.addEventListener('click', ()=>{
-  if(!ready){ setStatus('Loading songs…'); loadYouTubeAPI(); return; }
-  try{
-    const state = player.getPlayerState();
-    if(state === YT.PlayerState.PLAYING) player.pauseVideo();
-    else player.playVideo();
-  }catch(e){ setStatus('YouTube playback unavailable'); }
-});
+playBtn.onclick = () => {
+  if (!ready) {
+    loadYouTubeAPI();
+    artist.textContent = 'Loading songs…';
+    return;
+  }
+  if (player.getPlayerState() === YT.PlayerState.PLAYING) player.pauseVideo();
+  else player.playVideo();
+};
 
-prevBtn.addEventListener('click', ()=>{ if(ready) player.previousVideo(); });
-nextBtn.addEventListener('click', ()=>{ if(ready) player.nextVideo(); });
+prevBtn.onclick = () => { if (ready) player.previousVideo(); };
+nextBtn.onclick = () => { if (ready) player.nextVideo(); };
 
-bell.addEventListener('click', ()=>{
+bell.onclick = () => {
   const a = new Audio('temple-bell.mp3');
-  a.play().catch(()=>{});
-  bell.animate([{transform:'rotate(-12deg)'},{transform:'rotate(12deg)'},{transform:'rotate(0)'}],{duration:450});
-});
+  a.play().catch(() => {});
+  bell.animate(
+    [{ transform: 'rotate(-12deg)' }, { transform: 'rotate(12deg)' }, { transform: 'rotate(0)' }],
+    { duration: 450 }
+  );
+};
 
-listBtn.addEventListener('click', ()=>playlist.classList.toggle('open'));
-closeList.addEventListener('click', ()=>playlist.classList.remove('open'));
+listBtn.onclick = () => playlist.classList.toggle('open');
+closeList.onclick = () => playlist.classList.remove('open');
 
 loadYouTubeAPI();
