@@ -107,6 +107,7 @@ async function loadPlaylistItems() {
       document.querySelectorAll('.pl-item').forEach(el => el.classList.remove('active'));
       row.classList.add('active');
 
+      // playVideoAt keeps the playlist context intact so Prev/Next keep working correctly.
       player.playVideoAt(i);
       try { player.setPlaybackQuality('small'); } catch (_) {}
       playing = true;
@@ -155,6 +156,32 @@ function fmt(sec) {
   sec = Math.max(0, Math.floor(sec || 0));
   return `${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, '0')}`;
 }
+
+// Click or drag on the progress bar to seek to that position in the current song.
+const barEl = document.querySelector('.bar');
+let dragging = false;
+
+function seekFromEvent(e) {
+  if (!player || !ready) return;
+  const rect = barEl.getBoundingClientRect();
+  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+  let ratio = (clientX - rect.left) / rect.width;
+  ratio = Math.min(1, Math.max(0, ratio));
+  const d = player.getDuration() || 0;
+  if (!d) return;
+  const seekTo = ratio * d;
+  player.seekTo(seekTo, true);
+  progress.style.width = `${ratio * 100}%`;
+  currentTime.textContent = fmt(seekTo);
+}
+
+barEl.addEventListener('mousedown', (e) => { dragging = true; seekFromEvent(e); });
+window.addEventListener('mousemove', (e) => { if (dragging) seekFromEvent(e); });
+window.addEventListener('mouseup', () => { dragging = false; });
+
+barEl.addEventListener('touchstart', (e) => { dragging = true; seekFromEvent(e); });
+window.addEventListener('touchmove', (e) => { if (dragging) seekFromEvent(e); });
+window.addEventListener('touchend', () => { dragging = false; });
 
 function startProgress() {
   stopProgress();
