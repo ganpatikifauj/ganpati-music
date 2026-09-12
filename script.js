@@ -11,221 +11,182 @@ const progress = document.querySelector('.bar span');
 const currentTime = document.querySelector('.times span:first-child');
 const plItems = document.querySelector('#plItems');
 
-let player = null;
-let ready = false;
 let playing = false;
 let timer = null;
-let playlistIds = [];
+let currentIndex = 0;
 
-// Real YouTube playback via the official IFrame Player API.
-// The player stays visible (small thumbnail) per YouTube's Terms of Service — it is not hidden or disguised.
-window.onYouTubeIframeAPIReady = function () {
-  player = new YT.Player('yt', {
-    width: '100%',
-    height: '100%',
-    playerVars: {
-      listType: 'playlist',
-      list: 'PLBdB2QrKw3SQ',
-      autoplay: 0,
-      enablejsapi: 1,
-      controls: 0,
-      rel: 0,
-      playsinline: 1,
-      origin: window.location.origin
-    },
-    events: {
-      onReady: () => {
-        ready = true;
-        artist.textContent = 'Ready — Play दबाएँ';
-        try { player.setPlaybackQuality('small'); } catch (_) {}
-        updateInfo();
-        loadPlaylistItems();
-        pollForPlaylist();
-      },
-      onStateChange: (e) => {
-        playing = e.data === YT.PlayerState.PLAYING;
-        playBtn.textContent = playing ? '❚❚' : '▶';
-        if (playing) startProgress(); else stopProgress();
-        updateInfo();
-        highlightActive();
-        if (!playlistIds.length) loadPlaylistItems();
-      },
-      onError: () => {
-        artist.textContent = 'YouTube song unavailable';
-      }
-    }
-  });
-};
+const tracks = [
+  { src: 'songs/song1.mp3', title: 'Song 1', artist: 'Local Recording' },
+  { src: 'songs/song2.mp3', title: 'Song 2', artist: 'Local Recording' },
+  { src: 'songs/song3.mp3', title: 'Song 3', artist: 'Local Recording' },
+  { src: 'songs/song4.mp3', title: 'Song 4', artist: 'Local Recording' },
+  { src: 'songs/song5.mp3', title: 'Song 5', artist: 'Local Recording' },
+  { src: 'songs/song6.mp3', title: 'Song 6', artist: 'Local Recording' }
+];
 
-function loadYouTubeAPI() {
-  if (document.querySelector('script[data-youtube-api]')) return;
-  const s = document.createElement('script');
-  s.src = 'https://www.youtube.com/iframe_api';
-  s.dataset.youtubeApi = '1';
-  document.head.appendChild(s);
-}
-
-function updateInfo() {
-  if (!player || !ready) return;
-  try {
-    const data = player.getVideoData();
-    if (data && data.title) title.textContent = data.title;
-    if (data && data.author) artist.textContent = data.author;
-  } catch (_) {}
-}
-
-// Build the real, playable song list from the loaded YouTube playlist.
-// Titles/thumbnails come from YouTube's public oEmbed + thumbnail endpoints (no scraping, no API key needed).
-async function loadPlaylistItems() {
-  try {
-    playlistIds = player.getPlaylist() || [];
-  } catch (_) {
-    playlistIds = [];
-  }
-  if (!playlistIds.length) {
-    plItems.innerHTML = '<p class="pl-loading">Playlist load nahi ho payi</p>';
-    return;
-  }
-
-  plItems.innerHTML = '';
-  playlistIds.forEach((id, i) => {
-    const row = document.createElement('div');
-    row.className = 'pl-item';
-    row.dataset.index = i;
-    row.innerHTML = `
-      <span class="plnum">${i + 1}</span>
-      <img src="https://img.youtube.com/vi/${id}/mqdefault.jpg" alt="">
-      <div class="pltxt"><b>Loading…</b><span>&nbsp;</span></div>`;
-    row.onclick = () => {
-      // Instant UI feedback so it doesn't feel stuck while YouTube buffers the new track.
-      const b = row.querySelector('.pltxt b');
-      const span = row.querySelector('.pltxt span');
-      title.textContent = b ? b.textContent : `Track ${i + 1}`;
-      artist.textContent = 'Loading…';
-      progress.style.width = '0%';
-      currentTime.textContent = '0:00';
-      document.querySelectorAll('.pl-item').forEach(el => el.classList.remove('active'));
-      row.classList.add('active');
-
-      // playVideoAt keeps the playlist context intact so Prev/Next keep working correctly.
-      player.playVideoAt(i);
-      try { player.setPlaybackQuality('small'); } catch (_) {}
-      playing = true;
-      playBtn.textContent = '❚❚';
-    };
-    plItems.appendChild(row);
-
-    // Fetch real title/channel name for this track (public oEmbed endpoint).
-    fetch(`https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${id}&format=json`)
-      .then(r => r.ok ? r.json() : null)
-      .then(info => {
-        if (!info) return;
-        const b = row.querySelector('.pltxt b');
-        const span = row.querySelector('.pltxt span');
-        if (b) b.textContent = info.title || `Track ${i + 1}`;
-        if (span) span.textContent = info.author_name || '';
-      })
-      .catch(() => {
-        const b = row.querySelector('.pltxt b');
-        if (b) b.textContent = `Track ${i + 1}`;
-      });
-  });
-
-  highlightActive();
-}
-
-function highlightActive() {
-  if (!player || !ready) return;
-  let idx = 0;
-  try { idx = player.getPlaylistIndex(); } catch (_) {}
-  document.querySelectorAll('.pl-item').forEach(el => {
-    el.classList.toggle('active', Number(el.dataset.index) === idx);
-  });
-}
-
-// YouTube sometimes needs a moment before getPlaylist() returns real data — retry quickly a few times.
-function pollForPlaylist(tries = 0) {
-  if (playlistIds.length || tries > 15) return;
-  setTimeout(() => {
-    loadPlaylistItems();
-    pollForPlaylist(tries + 1);
-  }, 300);
-}
+const audio = new Audio();
+audio.preload = 'metadata';
 
 function fmt(sec) {
   sec = Math.max(0, Math.floor(sec || 0));
   return `${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, '0')}`;
 }
 
-// Click or drag on the progress bar to seek to that position in the current song.
-const barEl = document.querySelector('.bar');
-let dragging = false;
-
-function seekFromEvent(e) {
-  if (!player || !ready) return;
-  const rect = barEl.getBoundingClientRect();
-  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-  let ratio = (clientX - rect.left) / rect.width;
-  ratio = Math.min(1, Math.max(0, ratio));
-  const d = player.getDuration() || 0;
-  if (!d) return;
-  const seekTo = ratio * d;
-  player.seekTo(seekTo, true);
-  progress.style.width = `${ratio * 100}%`;
-  currentTime.textContent = fmt(seekTo);
+function updateInfo() {
+  const t = tracks[currentIndex];
+  title.textContent = t.title;
+  artist.textContent = t.artist;
+  currentTime.textContent = fmt(audio.currentTime);
+  const d = audio.duration || 0;
+  progress.style.width = d ? `${Math.min(100, audio.currentTime / d * 100)}%` : '0%';
 }
 
-barEl.addEventListener('mousedown', (e) => { dragging = true; seekFromEvent(e); });
-window.addEventListener('mousemove', (e) => { if (dragging) seekFromEvent(e); });
-window.addEventListener('mouseup', () => { dragging = false; });
+function loadTrack(index, autoplay = false) {
+  currentIndex = (index + tracks.length) % tracks.length;
+  const t = tracks[currentIndex];
+  audio.src = t.src;
+  audio.load();
+  title.textContent = t.title;
+  artist.textContent = 'Loading…';
+  currentTime.textContent = '0:00';
+  progress.style.width = '0%';
+  highlightActive();
 
-barEl.addEventListener('touchstart', (e) => { dragging = true; seekFromEvent(e); });
-window.addEventListener('touchmove', (e) => { if (dragging) seekFromEvent(e); });
-window.addEventListener('touchend', () => { dragging = false; });
+  if (autoplay) {
+    audio.play().catch(() => {
+      artist.textContent = 'Play दबाएँ';
+    });
+  }
+}
+
+function buildPlaylist() {
+  if (!plItems) return;
+  plItems.innerHTML = '';
+  tracks.forEach((t, i) => {
+    const row = document.createElement('div');
+    row.className = 'pl-item';
+    row.dataset.index = i;
+    row.innerHTML = `
+      <span class="plnum">${i + 1}</span>
+      <div class="pltxt"><b>${t.title}</b><span>${t.artist}</span></div>`;
+    row.onclick = () => {
+      loadTrack(i, true);
+      if (playlist) playlist.classList.remove('open');
+    };
+    plItems.appendChild(row);
+  });
+  highlightActive();
+}
+
+function highlightActive() {
+  document.querySelectorAll('.pl-item').forEach(el => {
+    el.classList.toggle('active', Number(el.dataset.index) === currentIndex);
+  });
+}
+
+audio.addEventListener('loadedmetadata', () => {
+  artist.textContent = tracks[currentIndex].artist;
+  updateInfo();
+});
+
+audio.addEventListener('timeupdate', updateInfo);
+
+audio.addEventListener('play', () => {
+  playing = true;
+  playBtn.textContent = '❚❚';
+  artist.textContent = tracks[currentIndex].artist;
+  startProgress();
+});
+
+audio.addEventListener('pause', () => {
+  playing = false;
+  playBtn.textContent = '▶';
+  stopProgress();
+});
+
+audio.addEventListener('ended', () => {
+  if (currentIndex < tracks.length - 1) {
+    loadTrack(currentIndex + 1, true);
+  } else {
+    loadTrack(0, false);
+  }
+});
+
+audio.addEventListener('error', () => {
+  playing = false;
+  playBtn.textContent = '▶';
+  artist.textContent = 'Audio file load nahi hui';
+});
 
 function startProgress() {
   stopProgress();
-  timer = setInterval(() => {
-    if (!player || !ready) return;
-    const d = player.getDuration() || 0;
-    const t = player.getCurrentTime() || 0;
-    currentTime.textContent = fmt(t);
-    progress.style.width = d ? `${Math.min(100, t / d * 100)}%` : '0%';
-  }, 500);
+  timer = setInterval(updateInfo, 500);
 }
 function stopProgress() {
   if (timer) clearInterval(timer);
   timer = null;
 }
 
+// Click or drag on the progress bar to seek.
+const barEl = document.querySelector('.bar');
+let dragging = false;
+
+function seekFromEvent(e) {
+  const rect = barEl.getBoundingClientRect();
+  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+  let ratio = (clientX - rect.left) / rect.width;
+  ratio = Math.min(1, Math.max(0, ratio));
+  const d = audio.duration || 0;
+  if (!d) return;
+  audio.currentTime = ratio * d;
+  updateInfo();
+}
+
+if (barEl) {
+  barEl.addEventListener('mousedown', e => { dragging = true; seekFromEvent(e); });
+  window.addEventListener('mousemove', e => { if (dragging) seekFromEvent(e); });
+  window.addEventListener('mouseup', () => { dragging = false; });
+  barEl.addEventListener('touchstart', e => { dragging = true; seekFromEvent(e); }, {passive:true});
+  window.addEventListener('touchmove', e => { if (dragging) seekFromEvent(e); }, {passive:true});
+  window.addEventListener('touchend', () => { dragging = false; });
+}
+
 playBtn.onclick = () => {
-  if (!ready) {
-    loadYouTubeAPI();
-    artist.textContent = 'Loading songs…';
-    return;
-  }
-  if (player.getPlayerState() === YT.PlayerState.PLAYING) player.pauseVideo();
-  else player.playVideo();
-};
-
-prevBtn.onclick = () => { if (ready) { player.previousVideo(); artist.textContent = 'Loading…'; } };
-nextBtn.onclick = () => { if (ready) { player.nextVideo(); artist.textContent = 'Loading…'; } };
-
-bell.onclick = () => {
-  const a = new Audio('temple-bell.mp3');
-  a.play().catch(() => {});
-  bell.animate(
-    [{ transform: 'rotate(-12deg)' }, { transform: 'rotate(12deg)' }, { transform: 'rotate(0)' }],
-    { duration: 450 }
-  );
-};
-
-listBtn.onclick = () => {
-  playlist.classList.toggle('open');
-  if (playlist.classList.contains('open') && !playlistIds.length && ready) {
-    loadPlaylistItems();
+  if (audio.paused) {
+    audio.play().catch(() => { artist.textContent = 'Play दबाएँ'; });
+  } else {
+    audio.pause();
   }
 };
-closeList.onclick = () => playlist.classList.remove('open');
 
-loadYouTubeAPI();
+prevBtn.onclick = () => {
+  loadTrack(currentIndex - 1, true);
+};
+
+nextBtn.onclick = () => {
+  loadTrack(currentIndex + 1, true);
+};
+
+if (bell) {
+  bell.onclick = () => {
+    const a = new Audio('temple-bell.mp3');
+    a.play().catch(() => {});
+    bell.animate(
+      [{ transform: 'rotate(-12deg)' }, { transform: 'rotate(12deg)' }, { transform: 'rotate(0)' }],
+      { duration: 450 }
+    );
+  };
+}
+
+if (listBtn && playlist) {
+  listBtn.onclick = () => playlist.classList.toggle('open');
+}
+if (closeList && playlist) {
+  closeList.onclick = () => playlist.classList.remove('open');
+}
+
+// Remove the old YouTube player/credit if the HTML still contains them.
+document.querySelectorAll('.ytbox, .yt-credit').forEach(el => el.remove());
+
+buildPlaylist();
+loadTrack(0, false);

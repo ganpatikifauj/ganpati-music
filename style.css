@@ -4,14 +4,6 @@
 .player{display:grid;grid-template-columns:70px 1fr auto;align-items:center;gap:14px;padding:12px 15px;border:1px solid #ffffff2b;background:#151821c9;border-radius:25px;box-shadow:0 18px 60px #0008;backdrop-filter:blur(22px);position:relative;z-index:2}
 .art{width:62px;height:62px}.art img{width:100%;height:100%;object-fit:cover;border-radius:16px}
 
-/* Visible YouTube player — required by YouTube's Terms of Service, not hidden or disguised.
-   Small circular icon, fixed to the viewport so it never scrolls off-screen and never
-   triggers a separate floating mini-player bar. */
-.ytbox{position:fixed;right:18px;bottom:18px;width:44px;height:44px;border-radius:50%;overflow:hidden;border:2px solid #ffffff60;background:#000;z-index:9999;box-shadow:0 8px 24px #000a}
-.ytbox #yt{width:100%;height:100%}
-.ytbox iframe{width:100%;height:100%;border:0;display:block;transform:scale(1.6)}
-.yt-credit{position:fixed;right:18px;bottom:66px;font-size:7px;color:#ccc;background:#000a;padding:2px 5px;border-radius:6px;z-index:9999;letter-spacing:.5px;opacity:.8}
-
 .now{font-size:9px;letter-spacing:1.5px;color:#ffb83d;font-weight:900}.meta{min-width:0;overflow:hidden}.meta h2{font-size:15px;margin:2px 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.meta p{font-size:11px;color:#aeb0b8;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.bar{height:3px;background:#555861;border-radius:4px;margin-top:7px;cursor:pointer;position:relative;padding:6px 0;background-clip:content-box;box-sizing:content-box}
 .bar span{display:block;width:25%;height:100%;background:#fff;pointer-events:none;border-radius:4px}.times{display:flex;justify-content:space-between;font-size:8px;color:#898c95;margin-top:3px}.controls{display:flex;align-items:center;gap:8px}.controls button{border:0;background:transparent;color:#fff;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:16px}.controls button:nth-child(2){background:#fff;color:#111;width:42px;height:42px;font-size:17px}.controls button:last-child{font-size:22px;color:#ddd}
 
@@ -39,3 +31,5 @@
 .pl-external{display:block;color:#ffbd4b;text-decoration:none;font-size:12px;padding-top:10px;flex-shrink:0;border-top:1px solid #ffffff18;margin-top:8px}
 .bottom-note{width:max-content;max-width:94%;margin:0 auto;background:#ffffff10;border:1px solid #ffffff1c;border-radius:14px;padding:9px 15px;display:flex;gap:9px;align-items:center}.bottom-note b{font-size:12px}.bottom-note small{color:#aaa;font-size:10px}footer{text-align:center;padding:28px;color:#aaa;font-size:12px}
 @media(max-width:700px){.topbar{height:60px}.live{display:none}.hero{display:flex;flex-direction:column-reverse;min-height:0;padding:25px 0 70px;gap:20px}.hero-copy{text-align:center;padding:0}.hero h1{font-size:58px;letter-spacing:-2px}.hero-copy p{font-size:26px}.ganpati{max-height:300px}.player{grid-template-columns:50px 1fr auto;gap:8px;padding:10px}.art{width:44px;height:44px}.ytbox{width:36px;height:36px;right:10px;bottom:10px}.yt-credit{right:10px;bottom:50px}.controls{gap:2px}.controls button{width:28px;height:28px}.controls button:nth-child(2){width:38px;height:38px}.controls button:last-child{display:none}.player-wrap{margin:-35px auto 30px}.bottom-note{margin-top:10px}}
+
+.ytbox,.yt-credit{display:none!important}
