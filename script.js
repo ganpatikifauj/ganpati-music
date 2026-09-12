@@ -1,8 +1,8 @@
 // Local, ad-free player for your own original songs. Add more entries here as you add files
-// to the /songs folder (upload the mp3 to your repo and add a matching line below).
+// (upload the mp3 to your repo root and add a matching line below).
 const SONGS = [
-  { file: 'songs/song1.mp3', title: 'My Song', artist: 'Original' }
-  // { file: 'songs/song2.mp3', title: 'Another Song', artist: 'Original' },
+  { file: 'song1.mp3', title: 'My Song', artist: 'Original' }
+  // { file: 'song2.mp3', title: 'Another Song', artist: 'Original' },
 ];
 
 const bell = document.querySelector('#bell');
