@@ -1,3 +1,10 @@
+// Local, ad-free player for your own original songs. Add more entries here as you add files
+// to the /songs folder (upload the mp3 to your repo and add a matching line below).
+const SONGS = [
+  { file: 'songs/song1.mp3', title: 'My Song', artist: 'Original' }
+  // { file: 'songs/song2.mp3', title: 'Another Song', artist: 'Original' },
+];
+
 const bell = document.querySelector('#bell');
 const listBtn = document.querySelector('#listBtn');
 const playlist = document.querySelector('#playlist');
@@ -5,188 +12,97 @@ const closeList = document.querySelector('#closeList');
 const playBtn = document.querySelector('#play');
 const prevBtn = document.querySelector('#prev');
 const nextBtn = document.querySelector('#next');
-const title = document.querySelector('#title');
-const artist = document.querySelector('#artist');
+const titleEl = document.querySelector('#title');
+const artistEl = document.querySelector('#artist');
 const progress = document.querySelector('.bar span');
-const currentTime = document.querySelector('.times span:first-child');
+const curTime = document.querySelector('#curTime');
+const durTime = document.querySelector('#durTime');
 const plItems = document.querySelector('#plItems');
+const audioEl = document.querySelector('#audioEl');
+const barEl = document.querySelector('#bar');
 
-let playing = false;
-let timer = null;
 let currentIndex = 0;
-
-const tracks = [
-  { src: 'songs/song1.mp3', title: 'Song 1', artist: 'Local Recording' },
-  { src: 'songs/song2.mp3', title: 'Song 2', artist: 'Local Recording' },
-  { src: 'songs/song3.mp3', title: 'Song 3', artist: 'Local Recording' },
-  { src: 'songs/song4.mp3', title: 'Song 4', artist: 'Local Recording' },
-  { src: 'songs/song5.mp3', title: 'Song 5', artist: 'Local Recording' },
-  { src: 'songs/song6.mp3', title: 'Song 6', artist: 'Local Recording' }
-];
-
-const audio = new Audio();
-audio.preload = 'metadata';
+let dragging = false;
 
 function fmt(sec) {
   sec = Math.max(0, Math.floor(sec || 0));
   return `${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, '0')}`;
 }
 
-function updateInfo() {
-  const t = tracks[currentIndex];
-  title.textContent = t.title;
-  artist.textContent = t.artist;
-  currentTime.textContent = fmt(audio.currentTime);
-  const d = audio.duration || 0;
-  progress.style.width = d ? `${Math.min(100, audio.currentTime / d * 100)}%` : '0%';
-}
-
-function loadTrack(index, autoplay = false) {
-  currentIndex = (index + tracks.length) % tracks.length;
-  const t = tracks[currentIndex];
-  audio.src = t.src;
-  audio.load();
-  title.textContent = t.title;
-  artist.textContent = 'Loading…';
-  currentTime.textContent = '0:00';
+function loadTrack(i, autoplay) {
+  currentIndex = (i + SONGS.length) % SONGS.length;
+  const song = SONGS[currentIndex];
+  audioEl.src = song.file;
+  titleEl.textContent = song.title;
+  artistEl.textContent = song.artist;
   progress.style.width = '0%';
-  highlightActive();
-
-  if (autoplay) {
-    audio.play().catch(() => {
-      artist.textContent = 'Play दबाएँ';
-    });
-  }
+  curTime.textContent = '0:00';
+  durTime.textContent = '0:00';
+  renderPlaylist();
+  if (autoplay) audioEl.play().catch(() => {});
 }
 
-function buildPlaylist() {
-  if (!plItems) return;
+function renderPlaylist() {
   plItems.innerHTML = '';
-  tracks.forEach((t, i) => {
+  SONGS.forEach((song, i) => {
     const row = document.createElement('div');
-    row.className = 'pl-item';
-    row.dataset.index = i;
+    row.className = 'pl-item' + (i === currentIndex ? ' active' : '');
     row.innerHTML = `
       <span class="plnum">${i + 1}</span>
-      <div class="pltxt"><b>${t.title}</b><span>${t.artist}</span></div>`;
-    row.onclick = () => {
-      loadTrack(i, true);
-      if (playlist) playlist.classList.remove('open');
-    };
+      <img src="ganpati-hero.png" alt="">
+      <div class="pltxt"><b>${song.title}</b><span>${song.artist}</span></div>`;
+    row.onclick = () => loadTrack(i, true);
     plItems.appendChild(row);
   });
-  highlightActive();
 }
 
-function highlightActive() {
-  document.querySelectorAll('.pl-item').forEach(el => {
-    el.classList.toggle('active', Number(el.dataset.index) === currentIndex);
-  });
-}
+playBtn.onclick = () => {
+  if (!audioEl.src) loadTrack(currentIndex, false);
+  if (audioEl.paused) audioEl.play().catch(() => {});
+  else audioEl.pause();
+};
+prevBtn.onclick = () => loadTrack(currentIndex - 1, true);
+nextBtn.onclick = () => loadTrack(currentIndex + 1, true);
 
-audio.addEventListener('loadedmetadata', () => {
-  artist.textContent = tracks[currentIndex].artist;
-  updateInfo();
+audioEl.addEventListener('play', () => { playBtn.textContent = '❚❚'; });
+audioEl.addEventListener('pause', () => { playBtn.textContent = '▶'; });
+audioEl.addEventListener('ended', () => loadTrack(currentIndex + 1, true));
+audioEl.addEventListener('loadedmetadata', () => { durTime.textContent = fmt(audioEl.duration); });
+audioEl.addEventListener('timeupdate', () => {
+  if (dragging) return;
+  const d = audioEl.duration || 0;
+  curTime.textContent = fmt(audioEl.currentTime);
+  progress.style.width = d ? `${Math.min(100, (audioEl.currentTime / d) * 100)}%` : '0%';
 });
-
-audio.addEventListener('timeupdate', updateInfo);
-
-audio.addEventListener('play', () => {
-  playing = true;
-  playBtn.textContent = '❚❚';
-  artist.textContent = tracks[currentIndex].artist;
-  startProgress();
-});
-
-audio.addEventListener('pause', () => {
-  playing = false;
-  playBtn.textContent = '▶';
-  stopProgress();
-});
-
-audio.addEventListener('ended', () => {
-  if (currentIndex < tracks.length - 1) {
-    loadTrack(currentIndex + 1, true);
-  } else {
-    loadTrack(0, false);
-  }
-});
-
-audio.addEventListener('error', () => {
-  playing = false;
-  playBtn.textContent = '▶';
-  artist.textContent = 'Audio file load nahi hui';
-});
-
-function startProgress() {
-  stopProgress();
-  timer = setInterval(updateInfo, 500);
-}
-function stopProgress() {
-  if (timer) clearInterval(timer);
-  timer = null;
-}
-
-// Click or drag on the progress bar to seek.
-const barEl = document.querySelector('.bar');
-let dragging = false;
 
 function seekFromEvent(e) {
   const rect = barEl.getBoundingClientRect();
   const clientX = e.touches ? e.touches[0].clientX : e.clientX;
   let ratio = (clientX - rect.left) / rect.width;
   ratio = Math.min(1, Math.max(0, ratio));
-  const d = audio.duration || 0;
+  const d = audioEl.duration || 0;
   if (!d) return;
-  audio.currentTime = ratio * d;
-  updateInfo();
+  audioEl.currentTime = ratio * d;
+  progress.style.width = `${ratio * 100}%`;
+  curTime.textContent = fmt(ratio * d);
 }
+barEl.addEventListener('mousedown', (e) => { dragging = true; seekFromEvent(e); });
+window.addEventListener('mousemove', (e) => { if (dragging) seekFromEvent(e); });
+window.addEventListener('mouseup', () => { dragging = false; });
+barEl.addEventListener('touchstart', (e) => { dragging = true; seekFromEvent(e); });
+window.addEventListener('touchmove', (e) => { if (dragging) seekFromEvent(e); });
+window.addEventListener('touchend', () => { dragging = false; });
 
-if (barEl) {
-  barEl.addEventListener('mousedown', e => { dragging = true; seekFromEvent(e); });
-  window.addEventListener('mousemove', e => { if (dragging) seekFromEvent(e); });
-  window.addEventListener('mouseup', () => { dragging = false; });
-  barEl.addEventListener('touchstart', e => { dragging = true; seekFromEvent(e); }, {passive:true});
-  window.addEventListener('touchmove', e => { if (dragging) seekFromEvent(e); }, {passive:true});
-  window.addEventListener('touchend', () => { dragging = false; });
-}
-
-playBtn.onclick = () => {
-  if (audio.paused) {
-    audio.play().catch(() => { artist.textContent = 'Play दबाएँ'; });
-  } else {
-    audio.pause();
-  }
+bell.onclick = () => {
+  const a = new Audio('temple-bell.mp3');
+  a.play().catch(() => {});
+  bell.animate(
+    [{ transform: 'rotate(-12deg)' }, { transform: 'rotate(12deg)' }, { transform: 'rotate(0)' }],
+    { duration: 450 }
+  );
 };
 
-prevBtn.onclick = () => {
-  loadTrack(currentIndex - 1, true);
-};
+listBtn.onclick = () => playlist.classList.toggle('open');
+closeList.onclick = () => playlist.classList.remove('open');
 
-nextBtn.onclick = () => {
-  loadTrack(currentIndex + 1, true);
-};
-
-if (bell) {
-  bell.onclick = () => {
-    const a = new Audio('temple-bell.mp3');
-    a.play().catch(() => {});
-    bell.animate(
-      [{ transform: 'rotate(-12deg)' }, { transform: 'rotate(12deg)' }, { transform: 'rotate(0)' }],
-      { duration: 450 }
-    );
-  };
-}
-
-if (listBtn && playlist) {
-  listBtn.onclick = () => playlist.classList.toggle('open');
-}
-if (closeList && playlist) {
-  closeList.onclick = () => playlist.classList.remove('open');
-}
-
-// Remove the old YouTube player/credit if the HTML still contains them.
-document.querySelectorAll('.ytbox, .yt-credit').forEach(el => el.remove());
-
-buildPlaylist();
 loadTrack(0, false);
