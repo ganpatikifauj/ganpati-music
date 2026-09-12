@@ -1,11 +1,11 @@
 // Local player for the songs stored in this GitHub Pages repository.
 const SONGS = [
-  { file: 'song1.mp3', title: 'Song 1', artist: 'Ganpati Ki Fauj' },
-  { file: 'song2.mp3', title: 'Song 2', artist: 'Ganpati Ki Fauj' },
-  { file: 'song3.mp3', title: 'Song 3', artist: 'Ganpati Ki Fauj' },
-  { file: 'song4.mp3', title: 'Song 4', artist: 'Ganpati Ki Fauj' },
-  { file: 'song5.mp3', title: 'Song 5', artist: 'Ganpati Ki Fauj' },
-  { file: 'song6.mp3', title: 'Song 6', artist: 'Ganpati Ki Fauj' }
+  { file: 'song1.mp3', title: 'Jai Ganesh Jai Ganesh Deva', artist: 'Ganpati Ki Fauj' },
+  { file: 'song2.mp3', title: 'Deva Shree Ganesha', artist: 'Ganpati Ki Fauj' },
+  { file: 'song3.mp3', title: 'Shendur Laal Chadhayo', artist: 'Ganpati Ki Fauj' },
+  { file: 'song4.mp3', title: 'Deva Oh Deva', artist: 'Ganpati Ki Fauj' },
+  { file: 'song5.mp3', title: 'Mere Ghar Mein Padharo Gajanan Ji', artist: 'Ganpati Ki Fauj' },
+  { file: 'song6.mp3', title: 'Teri Jai Ho Ganesh', artist: 'Ganpati Ki Fauj' }
 ];
 
 const bell = document.querySelector('#bell');
